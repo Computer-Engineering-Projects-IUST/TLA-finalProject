@@ -80,6 +80,7 @@ class Grammar:
                                     newstr.append("#")
                                 x[1].append(newstr)
                     k = -1
+                    i += 1
                 else:
                     i += 1
 
@@ -118,8 +119,10 @@ class Grammar:
                     if f"{subPrd[-2]}*{subPrd[-1]}" not in madeStates:
                         madeStates[f"{subPrd[-2]}*{subPrd[-1]}"] = f"NS{len(madeStates)}"
                     subPrd.append(madeStates[f"{subPrd[-2]}*{subPrd[-1]}"])
+                    ###
                     subPrd.pop(-3)
                     subPrd.pop(-2)
+                    ###
 
         for x in madeStates.items():
             newstr = x[0].split('*')
@@ -144,7 +147,7 @@ class Grammar:
                 for k in range(i, j):
                     for Prd in self.productions.items():
                         for subPrd in Prd[1]:
-                            if (i == 0 and j == 1) or (len(subPrd) == 2 and subPrd[0] in AcceptTeble[i][k] and subPrd[1] in AcceptTeble[k + 1][j]):
+                            if (len(subPrd) == 2 and subPrd[0] in AcceptTeble[i][k] and subPrd[1] in AcceptTeble[k + 1][j]):
                                 AcceptTeble[i][j].append(Prd[0])
                                 break
 
@@ -152,6 +155,7 @@ class Grammar:
             return "Accepted"
         else:
             return "Rejected"
+
 
 g = Grammar()
 g.callGrammarInitialize()
