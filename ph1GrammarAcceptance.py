@@ -50,19 +50,18 @@ class Grammar:
 
                     newGrammar.append(newString)
 
-                elif str[i] == '#':
-                    newGrammar.append("#")
                 else:
-                    if str[i] not in self.Letters.keys():
-                        self.Letters[str[i]] = "l{}".format(len(self.Letters))
-                        self.productions[self.Letters[str[i]]] = [[str[i]]]
-                    newGrammar.append(self.Letters[str[i]])
+                    if str[i] == '#':
+                        newGrammar.append("#")
+                    else:
+                        if str[i] not in self.Letters.keys():
+                            self.Letters[str[i]] = "l{}".format(len(self.Letters))
+                            self.productions[self.Letters[str[i]]] = [[str[i]]]
+                        
+                        newGrammar.append(self.Letters[str[i]])
                 i += 1
-
             newProduction.append(newGrammar)
-
         self.productions[left] = newProduction
-
 
     def removeLambdaProduction(self):
         states = list(self.productions.keys())
@@ -86,9 +85,12 @@ class Grammar:
 
     def getReachable(self, start, Visited):
         Visited.append(start)
-        for subPrd in self.productions[start]:
-            if len(subPrd) == 1 and subPrd[0] not in self.Letters and subPrd[0] not in Visited:
-                self.getReachable(subPrd[0], Visited)
+        if start in self.productions:
+            for subPrd in self.productions[start]:
+                if len(subPrd) == 1 and subPrd[0] not in self.Letters and subPrd[0] not in Visited:
+                    self.getReachable(subPrd[0], Visited)
+        else:
+             Visited.remove(start)
 
     def removeUnitProductions(self):
         for Prd in self.productions.items():
@@ -119,10 +121,8 @@ class Grammar:
                     if f"{subPrd[-2]}*{subPrd[-1]}" not in madeStates:
                         madeStates[f"{subPrd[-2]}*{subPrd[-1]}"] = f"NS{len(madeStates)}"
                     subPrd.append(madeStates[f"{subPrd[-2]}*{subPrd[-1]}"])
-                    ###
                     subPrd.pop(-3)
                     subPrd.pop(-2)
-                    ###
 
         for x in madeStates.items():
             newstr = x[0].split('*')
@@ -133,6 +133,11 @@ class Grammar:
 
     def Acceptance(self):
         n = len(self.reshte)
+
+        for i in range(len(self.reshte)):
+            if self.reshte[i] not in self.Letters.keys():
+                return "Rejected"
+
         AcceptTeble = [[[] for _ in range(n)] for _ in range(n)]
         for i in range(n):
             for Prd in self.productions.items():
