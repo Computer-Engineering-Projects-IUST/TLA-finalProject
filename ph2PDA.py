@@ -1,130 +1,163 @@
 class State:
-    def __init__(self, name_state):
-        self.name_state = name_state
-        self.transition = {}
+    def __init__(self, StateName):
+        self.StateName = StateName
+        self.Tra = {}
         
-class PDA:
-    def __init__(self, ss, ai, aas, fs):
-        self.states = []
-        self.alphabet_inputs = []
-        self.alphabet_stacks = []
-        self.final_states = []
-        for s in ss:
+class PushdownAutomata:
+    def __init__(self, sts, Inputalphabs, Stackalphabs, Finals):
+        self.States = []
+        self.InputAlphabet = []
+        self.StackAlphabet = []
+        self.FinalStates = []
+        for s in sts:
             temp = State(s)
-            self.states.append(temp)
-            if s in fs:
-                self.final_states.append(temp)
-        for i in range(len(ai)):
-            self.alphabet_inputs.append(ai[i][0])
-        self.alphabet_inputs.append('#')
-        for i in range(len(aas)):
-            self.alphabet_stacks.append(aas[i][0])
-        self.alphabet_stacks.append('#')
-        self.alphabet_stacks.append('$')
+            self.States.append(temp)
+            if s in Finals:
+                self.FinalStates.append(temp)
+        for i in range(len(Inputalphabs)):
+            self.InputAlphabet.append(Inputalphabs[i][0])
+        self.InputAlphabet.append('#')
+        for i in range(len(Stackalphabs)):
+            self.StackAlphabet.append(Stackalphabs[i][0])
+        self.StackAlphabet.append('#')
+        self.StackAlphabet.append('$')
 
-def accepted(string_input, s, stack, i, pda):
-    if i == len(string_input):
-        if s in pda.final_states:
+def DoesThePDAAccept(Inpstr, states, Stack, Counter, InputPDA):
+    if Counter == len(Inpstr):
+        if states in InputPDA.FinalStates:
             return True
-    if len(stack) == 0:
+    if len(Stack) == 0:
         return False
-    st1 = []
-    st2 = []
-    st3 = []
-    st4 = []
-    tempp = []
-    n = len(stack)
-    for j in range(n):
-        tempp.append(stack.pop())
-    for j in range(n - 1, -1, -1):
-        st1.append(tempp[j])
-        st2.append(tempp[j])
-        st3.append(tempp[j])
-        st4.append(tempp[j])
-    temp = tempp[0]
-    s1 = "#," + temp
-    s2 = "#,#"
-    s3 = ""
-    s4 = ""
-    if i < len(string_input):
-        s3 = string_input[i] + ",#"
-        s4 = string_input[i] + "," + temp
-    b = False
-    if s.transition.get(s1):
-        st1.pop()
-        for j in range(len(s.transition[s1])):
-            if s.transition[s1][j][1] != "#":
-                for k in range(len(s.transition[s1][j][1]) - 1, -1, -1):
-                    st1.append(s.transition[s1][j][1][k])
-            b = accepted(string_input, s.transition[s1][j][0], st1, i, pda)
-            st1.clear()
-            for k in range(len(tempp) - 1, 0, -1):
-                st1.append(tempp[k])
-            if b:
+    FirstStack = []
+    SecondStack = []
+    ThirdStack = []
+    FourthStack = []
+    TemporaryList = []
+    n = len(Stack)
+    i = 0
+    while i < n:
+        TemporaryList.append(Stack.pop())
+        i += 1
+
+    i = n - 1
+    while i >= 0:
+        FirstStack.append(TemporaryList[i])
+        SecondStack.append(TemporaryList[i])
+        ThirdStack.append(TemporaryList[i])
+        FourthStack.append(TemporaryList[i])
+        i -= 1
+    FirstChar = TemporaryList[0]
+    FirstString = "#," + FirstChar
+    SecondString = "#,#"
+    ThirdString = ""
+    FourthString = ""
+    if Counter < len(Inpstr):
+        ThirdString = Inpstr[Counter] + ",#"
+        FourthString = Inpstr[Counter] + "," + FirstChar
+    Result = False
+    if states.Tra.get(FirstString):
+        FirstStack.pop()
+        i = 0
+        while i < len(states.Tra[FirstString]):
+            if states.Tra[FirstString][i][1] != "#":
+                k = len(states.Tra[FirstString][i][1]) - 1
+                while k >= 0:
+                    FirstStack.append(states.Tra[FirstString][i][1][k])
+                    k -= 1
+            Result = DoesThePDAAccept(Inpstr, states.Tra[FirstString][i][0], FirstStack, Counter, InputPDA)
+            FirstStack.clear()
+            k = len(TemporaryList) - 1
+            while k > 0:
+                FirstStack.append(TemporaryList[k])
+                k -= 1
+            if Result:
                 return True
-    if s.transition.get(s2):
-        for j in range(len(s.transition[s2])):
-            if s.transition[s2][j][1] != "#":
-                for k in range(len(s.transition[s2][j][1]) - 1, -1, -1):
-                    st2.append(s.transition[s2][j][1][k])
-            b = accepted(string_input, s.transition[s2][j][0], st2, i, pda)
-            st2.clear()
-            for k in range(len(tempp) - 1, -1, -1):
-                st2.append(tempp[k])
-            if b:
+            i += 1
+    if states.Tra.get(SecondString):
+        i = 0
+        while i < len(states.Tra[SecondString]):
+            if states.Tra[SecondString][i][1] != "#":
+                k = len(states.Tra[SecondString][i][1]) - 1
+                while k >= 0:
+                    SecondStack.append(states.Tra[SecondString][i][1][k])
+                    k -= 1
+            Result = DoesThePDAAccept(Inpstr, states.Tra[SecondString][i][0], SecondStack, Counter, InputPDA)
+            SecondStack.clear()
+            k = len(TemporaryList) - 1
+            while k >= 0:
+                SecondStack.append(TemporaryList[k])
+                k -= 1
+            if Result:
                 return True
-    if s.transition.get(s3):
-        for j in range(len(s.transition[s3])):
-            if s.transition[s3][j][1] != "#":
-                for k in range(len(s.transition[s3][j][1]) - 1, -1, -1):
-                    st3.append(s.transition[s3][j][1][k])
-            b = accepted(string_input, s.transition[s3][j][0], st3, i + 1, pda)
-            st3.clear()
-            for k in range(len(tempp) - 1, -1, -1):
-                st3.append(tempp[k])
-            if b:
+            i += 1
+    if states.Tra.get(ThirdString):
+        i = 0
+        while i < len(states.Tra[ThirdString]):
+            if states.Tra[ThirdString][i][1] != "#":
+                k = len(states.Tra[ThirdString][i][1]) - 1
+                while k >= 0:
+                    ThirdStack.append(states.Tra[ThirdString][i][1][k])
+                    k -= 1
+            Result = DoesThePDAAccept(Inpstr, states.Tra[ThirdString][i][0], ThirdStack, Counter + 1, InputPDA)
+            ThirdStack.clear()
+            k = len(TemporaryList) - 1
+            while k >= 0:
+                ThirdStack.append(TemporaryList[k])
+                k -= 1
+            if Result:
                 return True
-    if s.transition.get(s4):
-        st4.pop()
-        for j in range(len(s.transition[s4])):
-            if s.transition[s4][j][1] != "#":
-                for k in range(len(s.transition[s4][j][1]) - 1, -1, -1):
-                    st4.append(s.transition[s4][j][1][k])
-            b = accepted(string_input, s.transition[s4][j][0], st4, i + 1, pda)
-            st4.clear()
-            for k in range(len(tempp) - 1, 0, -1):
-                st4.append(tempp[k])
-            if b:
+            i += 1
+    if states.Tra.get(FourthString):
+        FourthStack.pop()
+        i = 0
+        while i < len(states.Tra[FourthString]):
+            if states.Tra[FourthString][i][1] != "#":
+                k = len(states.Tra[FourthString][i][1]) - 1
+                while k >= 0:
+                    FourthStack.append(states.Tra[FourthString][i][1][k])
+                    k -= 1
+            Result = DoesThePDAAccept(Inpstr, states.Tra[FourthString][i][0], FourthStack, Counter + 1, InputPDA)
+            FourthStack.clear()
+            k = len(TemporaryList) - 1
+            while k > 0:
+                FourthStack.append(TemporaryList[k])
+                k -= 1
+            if Result:
                 return True
+            i += 1
     return False
 
 if __name__ == "__main__":
     states = input().strip('{').strip('}').split(',')
-    alphabet_input = input().strip('{').strip('}').split(',')
-    alphabet_stack = input().strip('{').strip('}').split(',')
-    final_states = input().strip('{').strip('}').split(',')
+    InputAlphabet = input().strip('{').strip('}').split(',')
+    StackAlphabet = input().strip('{').strip('}').split(',')
+    FinalStates = input().strip('{').strip('}').split(',')
     n = int(input())
-    pda = PDA(states, alphabet_input, alphabet_stack, final_states)
-    for i in range(n):
-        input_str = input().split("),(")
-        one = input_str[0].strip('(').split(',')
-        two = input_str[1].strip(')').split(',')
-        find1 = -1
-        find2 = -1
-        for j in range(len(pda.states)):
-            if pda.states[j].name_state == one[0]:
-                find1 = j
-            if pda.states[j].name_state == two[1]:
-                find2 = j
-        if one[1] + "," + one[2] in pda.states[find1].transition:
-            pda.states[find1].transition[one[1] + "," + one[2]].append((pda.states[find2], two[0]))
+    InputPDA = PushdownAutomata(states, InputAlphabet, StackAlphabet, FinalStates)
+    i = 0
+    while i < n:
+        Input = input().split("),(")
+        First = Input[0].strip('(').split(',')
+        Second = Input[1].strip(')').split(',')
+        Result1 = -1
+        Result2 = -1
+        j = 0
+        while j < len(InputPDA.States):
+            if InputPDA.States[j].StateName == First[0]:
+                Result1 = j
+            if InputPDA.States[j].StateName == Second[1]:
+                Result2 = j
+            j += 1
+        if First[1] + "," + First[2] in InputPDA.States[Result1].Tra:
+            InputPDA.States[Result1].Tra[First[1] + "," + First[2]].append((InputPDA.States[Result2], Second[0]))
         else:
-            temp = [(pda.states[find2], two[0])]
-            pda.states[find1].transition[one[1] + "," + one[2]] = temp
-    string_input = input().strip()
+            tempList = [(InputPDA.States[Result2], Second[0])]
+            InputPDA.States[Result1].Tra[First[1] + "," + First[2]] = tempList
+        i += 1
+    Inpstr = input().strip()
     stack = ['$']
-    string_input = string_input.replace("#", "")
-    if accepted(string_input, pda.states[0], stack, 0, pda):
-        print("Accepted")
-    else:
+    Inpstr = Inpstr.replace("#", "")
+    if DoesThePDAAccept(Inpstr, InputPDA.States[0], stack, 0, InputPDA) is False:
         print("Rejected")
+    else:
+        print("Accepted")
