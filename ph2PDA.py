@@ -39,13 +39,11 @@ def DoesThePDAAccept(Inpstr, states, Stack, Counter, InputPDA):
         TemporaryList.append(Stack.pop())
         i += 1
 
-    i = n - 1
-    while i >= 0:
-        FirstStack.append(TemporaryList[i])
-        SecondStack.append(TemporaryList[i])
-        ThirdStack.append(TemporaryList[i])
-        FourthStack.append(TemporaryList[i])
-        i -= 1
+    FirstStack.extend(reversed(TemporaryList))
+    SecondStack.extend(reversed(TemporaryList))
+    ThirdStack.extend(reversed(TemporaryList))
+    FourthStack.extend(reversed(TemporaryList))
+    
     FirstChar = TemporaryList[0]
     FirstString = "#," + FirstChar
     SecondString = "#,#"
