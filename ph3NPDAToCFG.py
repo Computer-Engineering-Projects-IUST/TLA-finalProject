@@ -171,10 +171,16 @@ def RemoveNullableVariable(all_variables, temp_Simplified):
     nullableVariable = None
     variablesWithoutNullable = []
 
-    for variable in temp_Simplified:
-        for adj in variable.adjacent_in_Rule:
+    i = 0
+    while i < len(temp_Simplified):
+        variable = temp_Simplified[i]
+        j = 0
+        while j < len(variable.adjacent_in_Rule):
+            adj = variable.adjacent_in_Rule[j]
             if adj.Item1 == '_':
                 nullableVariable = variable.Rule_Name
+            j += 1
+        i += 1
 
     for variable in all_variables:
         variablesWithoutNullable.append(variable)
